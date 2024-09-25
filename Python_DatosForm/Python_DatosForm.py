@@ -3,9 +3,9 @@
 ## Almacenamiento en TXT sin validación 
 import tkinter as tk
 from tkinter import messagebox
+import re
 
 ### Definicion de funciones
-
 def limpiar_campos():
     tbNombre.delete(0, tk.END)
     tbApellidos.delete(0, tk.END)
@@ -32,24 +32,49 @@ def guardar_valores():
     elif var_genero.get()==2:
         genero = "Mujer"
 
+    #Validacion de formatos
+    if (EnteroValido(Edad)and DecimalValido(Estatura)and TelefonoValido(Telefono)and TextoValido(nombres)and TextoValido(apellidos)):
+
     #Generar la cadena de caracteres
-    datos = "Nombre: "+ nombres +"\n"+"Apellidos: " + apellidos +"\n"+"Telefono: " + Telefono +"\n"+"Edad: " + Edad +"\n"+"Estatura: " + Estatura + "\n"
-    "Genero: " +genero+"\n" 
+        datos = "Nombre: "+ nombres +"\n"+"Apellidos: " + apellidos +"\n"+"Telefono: " + Telefono +"\n"+"Edad: " + Edad +"\n"+"Estatura: " + Estatura + "\n"+"Genero: " +genero+"\n" 
 
     #guardar los datos en un archivo TXT
-    with open("C:/Users/briaq/OneDrive/Documents/302024Datos.txt","a") as archivo:
-        archivo.write(datos+"\n\n")
+        with open("C:/Users/briaq/OneDrive/Documents/302024Datos.txt","a") as archivo:
+           archivo.write(datos+"\n\n")
+        
 
     #mostrar mensaje de confirmacion
-    messagebox.showinfo("Informacion", "Datos guardados con éxito: \n\n" + datos)
-    tbNombre.delete(0,tk.END)
-    tbApellidos.delete(0,tk.END)
-    tbEdad.delete(0,tk.END)
-    tbEstatura.delete(0,tk.END)
-    tbTelefono.delete(0,tk.END)
-    var_genero.set(0)
+        messagebox.showinfo("Informacion", "Datos guardados con éxito: \n\n" + datos)
+        tbNombre.delete(0,tk.END)
+        tbApellidos.delete(0,tk.END)
+        tbEdad.delete(0,tk.END)
+        tbEstatura.delete(0,tk.END)
+        tbTelefono.delete(0,tk.END)
+        var_genero.set(0)
 
+    else:
+        messagebox.showerror("Error", "Algunos de los campos tiene forma invalida")
 
+#funciones de validacion
+
+def EnteroValido(valor):
+    try:
+        int(valor)
+        return True
+    except ValueError:
+        return False
+
+def DecimalValido(valor):
+    try:
+        float(valor)
+        return True
+    except ValueError:
+        return False
+
+def TelefonoValido(valor):
+    return valor.isdigit() and len(valor)==10
+def TextoValido(valor):
+    return bool(re.match("^[a-zA-Z\s]+$", valor))
 
 ## Creación de ventana
 ventana = tk.Tk()
@@ -79,7 +104,7 @@ lbEdad.pack()
 tbEdad = tk.Entry()
 tbEdad.pack()
 
-lbEstatura = tk.Label(ventana, text="Telefono: ")
+lbEstatura = tk.Label(ventana, text="Estatura: ")
 lbEstatura.pack()
 tbEstatura = tk.Entry()
 tbEstatura.pack()
@@ -98,7 +123,6 @@ btnBorrar.pack()
 btnGuardar=tk.Button(ventana, text="Guardar Datos", command=guardar_valores)
 btnGuardar.pack()
 
-## Ejecución de Ventana
 
 ventana.mainloop()
 
