@@ -1,11 +1,32 @@
-# 3MLIDTS - BrianAquino-03Python
-### Formulario de registro
-## Almacenamiento en TXT sin validación 
 import tkinter as tk
 from tkinter import messagebox
 import re
+import mysql.connector
 
 ### Definicion de funciones
+def insertarRegistro(nombres, apellidos,edad, telefono, estatura,genero):
+    try: 
+        conexion = mysql.connector.connect(
+            host = "localhost",
+            port = "3306",
+            user = "root",
+            password = "root",
+            database = "practica_7"
+            )
+
+        cursor = conexion.cursor()
+    #crear el query
+        query  = "INSERT INTO registros (Nombre, Apellidos, Edad, Estatura, Telefono,  Genero)" + "VALUES (%s, %s, %s, %s, %s, %s)"
+        valores = (nombres, apellidos, edad, estatura, telefono, genero)
+    #ejecucion del query
+        cursor.execute(query, valores)
+        conexion.commit()
+        cursor.close()
+        conexion.close()
+        messagebox.showinfo("Información", "Datos guardados en la base de datos")
+    except mysql.connector.Error as err:
+        messagebox.showerror("Error", f"Error al insertar los datos: {err}")
+
 def limpiar_campos():
     tbNombre.delete(0, tk.END)
     tbApellidos.delete(0, tk.END)
@@ -21,39 +42,34 @@ def guardar_valores():
     #obtener valores desde los entrys
     nombres = tbNombre.get()
     apellidos = tbApellidos.get()
-    Telefono = tbTelefono.get()
-    Edad = tbEdad.get()
-    Estatura = tbEstatura.get()
+    telefono = tbTelefono.get()
+    edad = tbEdad.get()
+    estatura = tbEstatura.get()
     ## Obtener el genero de los Radiobuttons
-    genero = ""
+    genero=""
+    
+
+    datos = "Nombre: "+ nombres +"\n"+"Apellidos: " + apellidos +"\n"+"Telefono: " + telefono +"\n"+"Edad: " + edad +"\n"+"Estatura: " + estatura + "\n"+"Genero: " + genero+"\n"
     if var_genero.get()==1:
         genero = "Hombre"
 
     elif var_genero.get()==2:
         genero = "Mujer"
-
     #Validacion de formatos
-    if (EnteroValido(Edad)and DecimalValido(Estatura)and TelefonoValido(Telefono)and TextoValido(nombres)and TextoValido(apellidos)):
+    if (EnteroValido(edad)and DecimalValido(estatura)and TelefonoValido(telefono)and TextoValido(nombres)and TextoValido(apellidos)):
 
     #Generar la cadena de caracteres
-        datos = "Nombre: "+ nombres +"\n"+"Apellidos: " + apellidos +"\n"+"Telefono: " + Telefono +"\n"+"Edad: " + Edad +"\n"+"Estatura: " + Estatura + "\n"+"Genero: " +genero+"\n" 
-
-    #guardar los datos en un archivo TXT
-        with open("C:/Users/briaq/OneDrive/Documents/302024Datos.txt","a") as archivo:
-           archivo.write(datos+"\n\n")
         
-
-    #mostrar mensaje de confirmacion
-        messagebox.showinfo("Informacion", "Datos guardados con éxito: \n\n" + datos)
-        tbNombre.delete(0,tk.END)
-        tbApellidos.delete(0,tk.END)
-        tbEdad.delete(0,tk.END)
-        tbEstatura.delete(0,tk.END)
-        tbTelefono.delete(0,tk.END)
-        var_genero.set(0)
+    #guardar los datos en un archivo TXT
+       
+        insertarRegistro(nombres, apellidos, edad, telefono, estatura, genero)
+        messagebox.showinfo("Informacion", "Datos guardados con exito: \n\n"+ datos)
+        limpiar_campos()
+        
+    #mostrar mensaje de confirmacio
 
     else:
-        messagebox.showerror("Error", "Algunos de los campos tiene forma invalida")
+        messagebox.showerror("Error", "Algunos de los campos tiene forma invalida \n\n" + datos)
 
 #funciones de validacion
 
@@ -125,4 +141,3 @@ btnGuardar.pack()
 
 
 ventana.mainloop()
-
